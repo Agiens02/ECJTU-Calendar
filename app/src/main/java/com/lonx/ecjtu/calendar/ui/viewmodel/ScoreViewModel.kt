@@ -60,6 +60,7 @@ class ScoreViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
+                            isRefreshing = false,
                             error = "用户未配置，请先在设置中绑定账号"
                         )
                     }
@@ -74,7 +75,14 @@ class ScoreViewModel(
         Logger.d(Tags.VIEWMODEL, "加载成绩: term=${term ?: "null"}, mode=$mode")
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+            val hasExistingScores = _uiState.value.scores.isNotEmpty()
+            _uiState.update {
+                if (refresh && hasExistingScores) {
+                    it.copy(isLoading = false, isRefreshing = true, error = null)
+                } else {
+                    it.copy(isLoading = true, isRefreshing = false, error = null)
+                }
+            }
 
             val result = if (refresh) {
                 // manual refresh: fetch from network (may save to local in repository)
@@ -89,6 +97,7 @@ class ScoreViewModel(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
+                        isRefreshing = false,
                         scores = scorePage.scores,
                         availableTerms = scorePage.availableTerms,
                         currentTerm = scorePage.currentTerm,
@@ -98,10 +107,13 @@ class ScoreViewModel(
                 // timestamp updates are handled by observeTermRefresh()
             }.onFailure { exception ->
                 Logger.e(Tags.VIEWMODEL, "成绩加载失败: ${exception.message}", exception)
+                val hasExistingScores = _uiState.value.scores.isNotEmpty()
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        error = exception.message ?: "加载失败，请重试"
+                        isRefreshing = false,
+                        error = if (hasExistingScores) null else (exception.message ?: "加载失败，请重试"),
+                        toastMessage = if (hasExistingScores) (exception.message ?: "刷新失败，请重试") else it.toastMessage
                     )
                 }
             }

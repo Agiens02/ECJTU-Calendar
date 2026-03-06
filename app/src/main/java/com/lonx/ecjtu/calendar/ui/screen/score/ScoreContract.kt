@@ -14,6 +14,7 @@ import com.lonx.ecjtu.calendar.domain.model.Score
  */
 data class ScoreUiState(
     val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
     val scores: List<Score> = emptyList(),
     val availableTerms: List<String> = emptyList(),
     val currentTerm: String = "",

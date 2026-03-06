@@ -4,6 +4,7 @@ import com.lonx.ecjtu.calendar.domain.model.SelectedCourse
 
 data class SelectedCourseUiState(
     val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
     val courses: List<SelectedCourse> = emptyList(),
     val availableTerms: List<String> = emptyList(),
     val currentTerm: String = "",

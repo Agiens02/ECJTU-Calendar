@@ -67,7 +67,8 @@ fun SelectedCourseScreen(
             modifier = Modifier
                 .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection)
         ) {
-        uiState.error?.let { errorMessage ->
+        val errorMessage = uiState.error
+        if (errorMessage != null && uiState.courses.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxSize(),
@@ -91,7 +92,7 @@ fun SelectedCourseScreen(
                 .weight(1f),
             overscrollEffect = null
         ) {
-            if (!uiState.isLoading && uiState.error == null) {
+            if (uiState.courses.isNotEmpty()) {
                 // 显示上次刷新时间
                 item {
                     val lastRefreshText = if (uiState.lastRefreshMillis > 0L) {
@@ -110,7 +111,7 @@ fun SelectedCourseScreen(
                     ) {
                         Text(
                             modifier = Modifier.align(Alignment.Center),
-                            text = "更新于：$lastRefreshText",
+                            text = if (uiState.isRefreshing) "更新中..." else "更新于：$lastRefreshText",
                             style = MiuixTheme.textStyles.footnote1,
                             color = MiuixTheme.colorScheme.onBackgroundVariant
                         )
@@ -128,7 +129,7 @@ fun SelectedCourseScreen(
                 }
             }
 
-            if (uiState.isLoading) {
+            if (uiState.isLoading && uiState.courses.isEmpty()) {
                 item {
                     Box(
                         modifier = Modifier.fillParentMaxSize(),

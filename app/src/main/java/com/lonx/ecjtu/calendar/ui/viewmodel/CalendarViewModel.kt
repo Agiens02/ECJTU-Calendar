@@ -33,7 +33,6 @@ class CalendarViewModel(
             )
         }
         observeUserConfig()
-        fetchCourses(LocalDate.now())
     }
 
     private fun observeUserConfig() {

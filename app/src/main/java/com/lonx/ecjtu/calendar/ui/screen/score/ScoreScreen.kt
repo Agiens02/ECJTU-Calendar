@@ -78,7 +78,8 @@ fun ScoreScreen(
 //                )
 //            }
 //        }
-        uiState.error?.let { errorMessage ->
+        val errorMessage = uiState.error
+        if (errorMessage != null && uiState.scores.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxSize(),
@@ -102,7 +103,7 @@ fun ScoreScreen(
                 .weight(1f),
             overscrollEffect = null
         ) {
-            if (!uiState.isLoading && uiState.error == null) {
+            if (uiState.scores.isNotEmpty()) {
                 // 显示上次刷新时间
                 item {
                     val lastRefreshText = if (uiState.lastRefreshMillis > 0L) {
@@ -121,7 +122,7 @@ fun ScoreScreen(
                     ) {
                         Text(
                             modifier = Modifier.align(Alignment.Center),
-                            text = "更新于：$lastRefreshText",
+                            text = if (uiState.isRefreshing) "更新中..." else "更新于：$lastRefreshText",
                             style = MiuixTheme.textStyles.footnote1,
                             color = MiuixTheme.colorScheme.onBackgroundVariant
                         )
@@ -139,7 +140,7 @@ fun ScoreScreen(
                 }
             }
 
-            if (uiState.isLoading) {
+            if (uiState.isLoading && uiState.scores.isEmpty()) {
                 item {
                     Box(
                         modifier = Modifier.fillParentMaxSize(),

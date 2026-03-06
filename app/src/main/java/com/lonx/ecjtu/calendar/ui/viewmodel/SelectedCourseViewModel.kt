@@ -56,6 +56,7 @@ class SelectedCourseViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
+                            isRefreshing = false,
                             error = "用户未配置，请先在设置中绑定账号"
                         )
                     }
@@ -67,7 +68,14 @@ class SelectedCourseViewModel(
     fun loadCourses(term: String? = null, refresh: Boolean = false, showToast: Boolean = false) {
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+            val hasExistingCourses = _uiState.value.courses.isNotEmpty()
+            _uiState.update {
+                if (refresh && hasExistingCourses) {
+                    it.copy(isLoading = false, isRefreshing = true, error = null)
+                } else {
+                    it.copy(isLoading = true, isRefreshing = false, error = null)
+                }
+            }
 
             val result = if (refresh) {
                 getSelectedCoursesUseCase(term)
@@ -79,6 +87,7 @@ class SelectedCourseViewModel(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
+                        isRefreshing = false,
                         courses = coursePage.courses,
                         availableTerms = coursePage.availableTerms,
                         currentTerm = coursePage.currentTerm,
@@ -86,10 +95,13 @@ class SelectedCourseViewModel(
                     )
                 }
             }.onFailure { exception ->
+                val hasExistingCourses = _uiState.value.courses.isNotEmpty()
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        error = exception.message ?: "加载失败，请重试"
+                        isRefreshing = false,
+                        error = if (hasExistingCourses) null else (exception.message ?: "加载失败，请重试"),
+                        toastMessage = if (hasExistingCourses) (exception.message ?: "刷新失败，请重试") else it.toastMessage
                     )
                 }
             }

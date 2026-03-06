@@ -23,6 +23,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
@@ -48,6 +50,7 @@ import top.yukonga.miuix.kmp.basic.ListPopupColumn
 import top.yukonga.miuix.kmp.basic.ListPopupDefaults
 import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
 import top.yukonga.miuix.kmp.basic.NavigationBar
+import top.yukonga.miuix.kmp.basic.NavigationBarItem
 import top.yukonga.miuix.kmp.basic.NavigationItem
 import top.yukonga.miuix.kmp.basic.PopupPositionProvider
 import top.yukonga.miuix.kmp.basic.Scaffold
@@ -90,6 +93,7 @@ fun MainScreen(
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { routes.size })
 
     val showRefreshDialog = remember { mutableStateOf(false) }
+    val hapticFeedback = LocalHapticFeedback.current
 
     val handlePageChange: (Int) -> Unit = remember(pagerState, coroutineScope) {
         { page ->
@@ -223,11 +227,16 @@ fun MainScreen(
                 )
             },
             bottomBar = {
-                NavigationBar(
-                    items = routes,
-                    selected = pagerState.currentPage,
-                    onClick = { index -> handlePageChange.invoke(index) }
-                )
+                NavigationBar {
+                    routes.forEachIndexed { index, item ->
+                        NavigationBarItem(
+                            selected = pagerState.currentPage == index,
+                            onClick = { handlePageChange.invoke(index) },
+                            icon = item.icon,
+                            label = item.label
+                        )
+                    }
+                }
             }
         ) { paddingValues ->
             HorizontalPager(
@@ -281,6 +290,7 @@ fun MainScreen(
                         TextButton(
                             text = "确定",
                             onClick = {
+                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                                 if (pagerState.currentPage == 2) {
                                     selectedCourseViewModel.loadCourses(refresh = true)
                                 } else if (pagerState.currentPage == 1) {

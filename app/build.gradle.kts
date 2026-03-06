@@ -7,7 +7,6 @@ import org.gradle.api.tasks.TaskAction
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
@@ -109,6 +108,11 @@ android {
     }
 }
 
+// 设置 APK/AAB 输出文件名基础名称（Gradle 9.0+ 使用 base.archivesName）
+base {
+    archivesName.set("ECJTU-Calendar")
+}
+
 // 使用 androidComponents API 注册构建信息任务
 
 // 存储任务名称而不是 TaskProvider 对象，避免内存泄漏风险
@@ -152,18 +156,6 @@ tasks.configureEach {
                 // 建立依赖关系
                 finalizedBy(infoTaskName)
             }
-        }
-    }
-}
-
-// 设置 APK 输出文件名
-android.applicationVariants.all {
-    val variantName = this.name
-    val buildType = if (variantName.contains("debug", ignoreCase = true)) "debug" else "release"
-
-    outputs.all {
-        if (this is com.android.build.gradle.internal.api.ApkVariantOutputImpl) {
-            outputFileName = "ECJTU-Calendar-${buildType}.apk"
         }
     }
 }

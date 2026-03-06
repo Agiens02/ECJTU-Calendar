@@ -73,11 +73,11 @@ import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
 import top.yukonga.miuix.kmp.basic.Scaffold
 import top.yukonga.miuix.kmp.basic.SmallTitle
+import top.yukonga.miuix.kmp.basic.SpinnerEntry
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextButton
 import top.yukonga.miuix.kmp.basic.TextField
 import top.yukonga.miuix.kmp.basic.TopAppBar
-import top.yukonga.miuix.kmp.extra.SpinnerEntry
 import top.yukonga.miuix.kmp.extra.SuperArrow
 import top.yukonga.miuix.kmp.extra.SuperDialog
 import top.yukonga.miuix.kmp.extra.SuperSpinner
@@ -513,6 +513,21 @@ fun SettingsScreen(
                         summary = "可燃乌龙茶",
                         onClick = {
                             openUrl(context, "https://github.com/Replica0110")
+                        },
+                        startAction = {
+                            Icon(
+                                modifier = Modifier.padding(end = 16.dp),
+                                imageVector = MiuixIcons.Regular.ContactsCircle,
+                                contentDescription = "开发者",
+                                tint = colorScheme.onBackground
+                            )
+                        }
+                    )
+                    SuperArrow(
+                        title = "开发者",
+                        summary = "MoChenYa",
+                        onClick = {
+                            openUrl(context, "https://github.com/mochenya/")
                         },
                         startAction = {
                             Icon(
